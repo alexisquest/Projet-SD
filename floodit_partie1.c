@@ -5,6 +5,8 @@
 #include "api_grille.h"
 #include "api_genere_instance.h"
 #include "fonctions.h"
+#include "graphe_zones.h"
+#include "Pile_case.h"
 
 int main(int argc, char *argv[]) {
   clock_t temps_initial;  /* Temps initial en micro-secondes */
@@ -73,6 +75,12 @@ int main(int argc, char *argv[]) {
     grille_attente_touche();
     grille_ferme_fenetre(G);
     grille_free(G);
+  }
+  
+  if(exo == 2){
+  	Graphe_zone* graph = NULL;
+  	cree_graphe_zone(M , dim , graph);
+  	affichage_graphe(graph , dim); 
   }
 
   return 0;
