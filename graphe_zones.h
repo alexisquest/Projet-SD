@@ -2,6 +2,9 @@
 #define _GRAPHE_ZONE_
 
 #include "liste_cases.h"
+#include "fonctions.h"
+
+
 
 typedef struct sommet Sommet;
 
@@ -18,6 +21,7 @@ struct sommet {
     ListeCases cases ;/* Listes des cases du sommet-zone */
     int nbcase_som ; /* Nombre de cases de cette liste */
     Cellule_som * sommet_adj ; /* Liste des ar\eteses pointeurs sur les sommets 16 adjacents */
+    int marque ;
 };
 
 
@@ -28,7 +32,7 @@ typedef struct graphe_zone {
 } Graphe_zone;
 
 
-Cellule_som * ajoute_liste_sommet(Sommet *s, Cellule_som *som); /*ajoute un pointeur sur Sommet à une liste chainée de Cellule_som passée en parametre */
+void ajoute_liste_sommet(Sommet *s, Cellule_som **som); /*ajoute un pointeur sur Sommet à une liste chainée de Cellule_som passée en parametre */
 
 void detruit_liste_somme(Cellule_som *som); //détruit une liste chainée passée en parametre SANS detruire les sommets pointées par cette liste
 
@@ -36,9 +40,12 @@ void ajoute_voisin(Sommet *s1, Sommet *s2); // met à jour deux sommets s1 et s2
 
 int adjacent(Sommet *s1, Sommet *s2); //renvoie vrai (1) si et seulement si deux sommets sont adjacents sinon false (0)
 
-void cree_graphe_zone(int** M, int nbCases, Graphe_zone *G);
+void init_graphe_zone(Graphe_zone ** G, int dim);
 
-void trouve_zone(int **M, int i, int j, Sommet *s, Graphe_zone *G, int nbCases);
+
+Graphe_zone* cree_graphe_zone(int** M, int nbCases);
+
+
 
 void affichage_graphe(Graphe_zone *G, int nbCases);
 

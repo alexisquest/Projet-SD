@@ -5,6 +5,7 @@
 #include "api_grille.h"
 #include "api_genere_instance.h"
 #include "fonctions.h"
+#include "fonctions_graph.h"
 #include "graphe_zones.h"
 #include "Pile_case.h"
 
@@ -67,9 +68,12 @@ int main(int argc, char *argv[]) {
     sequence_aleatoire_rapide(M , G , dim , nbcl ,aff);
   }
 
-  temps_final = clock();
-  temps_cpu = (temps_final - temps_initial) * 1e-6;
-  printf("%f\n", temps_cpu);
+  if(exo == 2){
+  	
+  	Graphe_zone* graph=cree_graphe_zone(M , dim);
+  	//affichage_graphe(graph , dim);
+  	max_bordure(graph,nbcl,dim,G,aff);
+  }
 
   if(aff == 1) {
     grille_attente_touche();
@@ -77,12 +81,11 @@ int main(int argc, char *argv[]) {
     grille_free(G);
   }
   
-  if(exo == 2){
-  	Graphe_zone* graph = NULL;
-  	cree_graphe_zone(M , dim , graph);
-  	affichage_graphe(graph , dim); 
-  }
-
+  
+  
+  temps_final = clock();
+  temps_cpu = (temps_final - temps_initial) * 1e-6;
+  printf("%f\n", temps_cpu);
   return 0;
 }
 

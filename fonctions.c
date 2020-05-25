@@ -3,15 +3,6 @@
 
 
 
-/*
-int sequence_aleatoire_rec(int **M, Grille *G, int dim, int nbcl, int aff) {
-  int cpt = 0;
-
-  return cpt;
-}
-*/
-
-
 int sequence_aleatoire_rec(int **M , Grille *G , int dim , int nbcl , int aff){
 	ListeCases L;
 	init_liste(&L);

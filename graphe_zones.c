@@ -1,17 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "graphe_zones.h"
-#include "liste_cases.h"
-#include "Pile_case.h"
 
-Cellule_som * ajoute_liste_sommet(Sommet *s, Cellule_som *som){
+
+#include "liste_cases.h"
+#include "fonctions.h"
+
+//ajoute un sommet dans une liste chainée de sommets
+void ajoute_liste_sommet(Sommet *s, Cellule_som **som){
     Cellule_som * tmp = (Cellule_som *) malloc(sizeof(Cellule_som));
     
     tmp->sommet = s;
-    tmp->suiv = som;
-    
-    return tmp;
+    tmp->suiv = *som;
+    *som=tmp;
 }
+
 
 
 void detruit_liste_somme(Cellule_som *som){
@@ -31,8 +34,8 @@ void detruit_liste_somme(Cellule_som *som){
 
 void ajoute_voisin(Sommet *s1, Sommet *s2){
     
-    s1->sommet_adj = ajoute_liste_sommet(s2, s1->sommet_adj); // ajout le sommet s2 dans la liste des sommets adjacents de s1
-    s2->sommet_adj = ajoute_liste_sommet(s1, s2->sommet_adj);  // ajout le sommet s1 dans la liste des sommets adjacents de s2
+    ajoute_liste_sommet(s2,&s1->sommet_adj); // ajout le sommet s2 dans la liste des sommets adjacents de s1
+    ajoute_liste_sommet(s1,&s2->sommet_adj);  // ajout le sommet s1 dans la liste des sommets adjacents de s2
 
 }
 
@@ -69,142 +72,156 @@ int adjacent(Sommet *s1, Sommet *s2){
 
 
 
-void cree_graphe_zone(int** M, int nbCases, Graphe_zone *G)
-{
+void init_graphe_zone(Graphe_zone ** G, int dim){
+	int i, j;
+	
+	(*G) = malloc(sizeof(*(*G)));
+	
+	(*G)->nbsom = 0;
+	(*G)->som = NULL;
+	
+	(*G)->mat = malloc(sizeof(*(*G)->mat) * dim);
+	for(i=0; i<dim; i++){
+		(*G)->mat[i] = malloc(sizeof(*(*G)->mat[i])*dim);
+		
+		for(j=0; j<dim; j++){
+			(*G)->mat[i][j]=NULL;
+		}
+	}
+}
 
-  int i, j;
-  Sommet *s = NULL, *s2 = NULL;
+
+
+Graphe_zone* cree_graphe_zone(int** M, int nbCases)
+{
+	
+  Graphe_zone* G=NULL;
+  init_graphe_zone(&G,nbCases);
+  int i, j,cpt=0;
+  Sommet *s=NULL ,*s1 = NULL, *s2 = NULL;
   // ici on considere G->som = NULL de base
-
+    ListeCases deja_fait =NULL;
   // allocation des sommets de G
-  for (i=0; i<nbCases; i++)
-    for (j=0; j<nbCases; j++)
-      if (G->mat[i][j] == NULL) {
-	s = (Sommet *) malloc(sizeof(Sommet)); // initalisation d'un sommet vide
-	s->nbcase_som = 0;
-	init_liste(&(s->cases));
-	s->cases->i = i;	
-	s->cases->j = j;
-	s->sommet_adj = NULL;
-	G->mat[i][j] = s;
-	(G->nbsom)++;
+  for (i=0; i<nbCases; i++){
+    for (j=0; j<nbCases; j++){
+    
+      if (existe(i,j,&deja_fait) ==0) {
 
-	/* ceci marche meme si G->som n'a pas de liste a la base
-	 * donc le "dernier" element sera a NULL
-	 */
-	G->som = ajoute_liste_sommet(s, G->som);
+      	
+		s = (Sommet *) malloc(sizeof(Sommet)); // initalisation d'un sommet vide
+        s->num=cpt;
+        cpt++;
+		s->nbcase_som = 0;
+		
+		init_liste(&(s->cases));
+		s->cl=M[i][j];
+		ajoute_en_tete(&(s->cases) , i , j);//ajoute  ds le sommet la case courant
+        s->nbcase_som++;
+		s->sommet_adj = NULL;
+		s-> marque=2;
+		
+		G->mat[i][j] = s;
+		(G->nbsom)++;;//creer le sommet avec la premiere case
+    
+     ajoute_liste_sommet(s,&G->som);//ajoute le sommet dans la liste des sommet du graphe
+      
+     // on récupère toutes les cases du sommet zone dans tmp
+     ListeCases tmp=NULL;
+     int taille=0;
+     trouve_zone_rec(M, nbCases , i ,  j , &taille , &tmp);
+     //on insère ces cases dans le sommet  
+    
+        while (tmp){
+            ajoute_en_tete(&(s->cases), tmp->i,tmp->j ); //on insere la case dans le sommet
+            G->mat[tmp->i][tmp->j] = s; // on pointe la case vers le sommet auquel il appartient 
+            ajoute_en_tete(&deja_fait, tmp->i,tmp->j ); // on ajoute le sommet a la liste "deja_fait",pour ne pas remettre cette dans un autre sommet 
+            tmp=tmp->suiv; //avance   
+        }
+     	s->nbcase_som+=taille;
 
-	// on remplit les sommets en appelant trouve_zone
-	trouve_zone(M, i, j, s, G, nbCases);
       }
-
-
-  // recherche des sommets adjacents
-  for (i=0; i < nbCases; i++)
-    for(j=0; j < (nbCases - 1); j++) {
-      /* Si deux cases adjacentes de la matrice pointent vers des Sommets
-       * differents qui ne sont pas deja adjacents alors une relation
-       * d'adjacence est ajoutée. Sinon, on passe aux cases suivantes
-       */
-      s = G->mat[i][j];
-      s2 = G->mat[i][j+1];
-      // si les sommets sont adjacents, on skip
-      if (s == s2 || adjacent(s, s2) != 0)
-	continue;
-
-      // Si les sommets sont diff et qu'ils ne sont pas deja adjacents
-      ajoute_voisin(s, s2);
     }
-}
-
-void trouve_zone(int **M, int i, int j, Sommet *s, Graphe_zone *G, int nbCases)
-{
-  Pile p;
-  Element *e;
-  /* Pile_case pileun; */
-  /* init_pile(&pileun); */
-  /* Pile_case piledeux= NULL; */
-  /* int nb = 0; */
-  /* s->cl = M[i][j]; */
-
-  /* empile(&p, i, j); */
-  /* liste_ajoute((&s->suiv), i, j); */
-
-  s->cl = M[i][j]; // Mise a jour de la couleur de la case
-  detruit_liste_somme(s->sommet_adj); // Suppresion des membres de la zone
-  s->nbcase_som = 0;
-
-
-  init_pile(&p);
-
-  empile(&p, i, j); // On empile la premiere case
-
-  while (!pile_vide(p)) {
-    e = depile(&p);
-    i = e->i, j = e->j; // On depile et recupere l'elem courant
-
-
-    if ((e->j+1 < nbCases) &&
-	(M[e->i][e->j] == s->cl) &&
-	(!pile_existe(&p, e->i, e->j+1)) &&
-	(!existe(e->i, e->j+1, &s->cases))) {
-      ajoute_en_tete(&s->cases, e->i, e->j+1); // Ajout de la case a la liste des membres de la zone
-      s->nbcase_som++; // Incr du compteur de zone
-      empile(&p, e->i, e->j+1);
-    }
-
-    if ((e->j-1 >= 0) &&
-	(M[e->i][e->j] == s->cl) &&
-	(!pile_existe(&p, e->i, e->j+1)) &&
-	(!existe(e->i, e->j-1, &s->cases))) {
-      ajoute_en_tete(&s->cases, e->i, e->j-1);
-      s->nbcase_som++;
-      empile(&p, e->i, e->j-1);
-    }
-
-    if ((e->i+1 < nbCases) &&
-	(M[e->i][e->j] == s->cl) &&
-	(!pile_existe(&p, e->i, e->j+1)) &&
-	(!existe(e->i+1, e->j, &s->cases))) {
-      ajoute_en_tete(&s->cases, e->i+1, e->j);
-      s->nbcase_som++;
-      empile(&p, e->i+1, e->j);
-    }
-
-    if ((e->i-1 >= 0) && (M[e->i][e->j] == s->cl) &&
-	(!pile_existe(&p, e->i, e->j+1)) &&
-	(!existe(e->i-1, e->j, &s->cases))) {
-      ajoute_en_tete((&s->cases), e->i-1, e->j);
-      s->nbcase_som++;
-      empile(&p, e->i-1, e->j);
-    }
-
-    //On pointe la case de la matrice de G sur la zone
-    G->mat[i][j] = s;
-    G->som++;
-
-    free(e);
-
   }
-  //  free(p);
 
+  //recherche des sommets adjacents
+  
+  for (i=0; i < nbCases; i++){
+    for(j=0; j < nbCases; j++) {
+   		s = G->mat[i][j];
+   		
+   		if(i+1<nbCases){
+      		s1 = G->mat[i+1][j];
+      		if (s == s1 || adjacent(s, s1) != 0)
+				continue;
+
+      		// Si les sommets sont diff et qu'ils ne sont pas deja adjacents
+      		ajoute_voisin(s, s1);
+      	}
+      	
+      	if(j+1<nbCases){
+      		s2 = G->mat[i][j+1];
+      		if (s == s2 || adjacent(s, s2) != 0)
+				continue;
+
+      		// Si les sommets sont diff et qu'ils ne sont pas deja adjacents
+      		ajoute_voisin(s, s2);
+      	}
+   	 
+    }
+  }
+  
+  
+  return G;
 }
+
+
 
 void affichage_graphe(Graphe_zone *G, int nbCases)
 {
+	
   int i=0, j=0;
-  Cellule_som *parcours; // sert a parcourir la liste des sommets
-
-  for (i=0; i<nbCases; i++)
-    for (j=0; j<nbCases; j++) {
-      parcours = G->mat[i][j]->sommet_adj;
-      printf("Dans le sommet [%d][%d], on a les noeuds ", i, j);
-      while (parcours) {
-	printf("%d ", parcours->sommet->num);
-	parcours = parcours->suiv;
+  Cellule_som *parcours_adj =NULL; // sert a parcourir la liste des sommets adjacents
+  
+  /*
+  for (j=0; j<nbCases; j++){
+    for (i=0; i<nbCases; i++) {
+      parcours_adj = G->mat[i][j]->sommet_adj;
+      
+      printf("le sommet [%d][%d] num du sommet:%d,couleur=%d, à comme sommet adjacent : \t", i, j,G->mat[i][j]->num,G->mat[i][j]->cl );
+      
+      while (parcours_adj) {
+	printf("num=%d\t,", parcours_adj->sommet->num);
+	parcours_adj = parcours_adj->suiv;
       }
       printf("\n");
     }
+    
+  }*/
+  /*
+  printf("affichage des sommets adjacents:\n");
+  Cellule_som* tmp_som = G->som;
+  while(tmp_som){
+  	printf("sommet num %d à comme voisin :",tmp_som->sommet->num);
+  	parcours_adj = tmp_som->sommet->sommet_adj;
+  	while (parcours_adj) {
+		printf(" %d", parcours_adj->sommet->num);
+		parcours_adj = parcours_adj->suiv;
+    }
+    printf("\n");
+    tmp_som=tmp_som->suiv;
+  }
+  printf("\n");
+  */
+  //printf("num de sommet :\n");
+  for (j=0; j<nbCases; j++){
+    for (i=0; i<nbCases; i++) {
+      parcours_adj = G->mat[i][j]->sommet_adj;
+      
+      printf("  %d",G->mat[i][j]->cl);
+      
+    }
+    printf("\n");
+  }
 
 }
 

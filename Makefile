@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -W -Wall -Os `sdl2-config --cflags`
 LDFLAGS = `sdl2-config --libs`
-EXEC = floodit floodit_partie1
+EXEC = floodit_partie1
 
 all: $(EXEC)
 
@@ -18,26 +18,27 @@ Zsg.o: Zsg.c Zsg.h liste_cases.h
 	 $(CC) $(CFLAGS) -c Zsg.c
 
 
-Pile_case.o: Pile_case.c Pile_case.h
-	$(CC) $(CFLAGS) -c Pile_case.c	 
 
-graphe_zones.o: graphe_zones.c graphe_zones.h
-	$(CC) $(CFLAGS) -c graphe_zones.c
+graphe_zones.o: graphe_zones.c graphe_zones.h fonctions.h
+	$(CC) $(CFLAGS) -c graphe_zones.c 
 
 fonctions.o: fonctions.c fonctions.h liste_cases.h Zsg.h
 	$(CC) $(CFLAGS) -c fonctions.c
+	
+fonctions_graph.o: fonctions_graph.c fonctions_graph.h graphe_zones.h liste_cases.h 
+	$(CC) $(CFLAGS) -c fonctions_graph.c
 
-floodit.o: floodit.c
-	$(CC) $(CFLAGS) -c floodit.c 
+#floodit.o: floodit.c
+	#$(CC) $(CFLAGS) -c floodit.c 
 
-floodit: floodit.o liste_cases.o  api_grille.o api_genere_instance.o fonctions.o Zsg.o
-	$(CC) -o floodit floodit.o liste_cases.o api_grille.o api_genere_instance.o fonctions.o Zsg.o $(LDFLAGS)
+#floodit: floodit.o liste_cases.o  api_grille.o api_genere_instance.o fonctions.o Zsg.o fonctions_graph.o  graphe_zones.o
+	#$(CC) -o floodit floodit.o liste_cases.o api_grille.o api_genere_instance.o fonctions.o Zsg.o fonctions_graph.o $(LDFLAGS)
 
 floodit_partie1.o: floodit_partie1.c
 	$(CC) $(CFLAGS) -c floodit_partie1.c 
 
-floodit_partie1: floodit_partie1.o liste_cases.o  api_grille.o api_genere_instance.o fonctions.o Zsg.o Pile_case.o graphe_zones.o
-	$(CC) -o floodit_partie1 floodit_partie1.o liste_cases.o api_grille.o api_genere_instance.o fonctions.o Zsg.o Pile_case.o graphe_zones.o $(LDFLAGS)
+floodit_partie1: floodit_partie1.o liste_cases.o  api_grille.o api_genere_instance.o fonctions.o Zsg.o graphe_zones.o fonctions_graph.o
+	$(CC) -o floodit_partie1 floodit_partie1.o liste_cases.o api_grille.o api_genere_instance.o fonctions.o Zsg.o graphe_zones.o fonctions_graph.o $(LDFLAGS)
 
 clean:
 	rm -f *.o $(EXEC)

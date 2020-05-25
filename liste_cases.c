@@ -1,6 +1,7 @@
 #include "liste_cases.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 /* Initialise une liste vide */
 
@@ -51,7 +52,9 @@ void detruit_liste(ListeCases *L) {
 
 /* test si la case i,j passé en parametre est déjà dans la liste L */
 int existe(int i,int j, ListeCases *L){
+
 	ListeCases ite = *L;
+	
 	while(ite){
 		if(ite->i==i && ite->j==j){
 			return 1;
