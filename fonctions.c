@@ -89,11 +89,12 @@ void trouve_zone_rec(int **M , int dim , int i , int j , int *taille , ListeCase
 }
 
 
-void sequence_aleatoire_rapide(int **M , Grille *G , int dim , int nbcl , int aff){
-	//printf("debut sequence aléatoire\n");
-	Zsg *Z;
+int sequence_aleatoire_rapide(int **M , Grille *G , int dim , int nbcl , int aff){
 	
+	Zsg *Z;
+
 	int cpt=0;
+	int nbessaie=0;
 	init_Zsg(&Z,dim,nbcl);
 	cpt+=agrandit_Zsg(M,Z,M[0][0],0,0);
 	/*affichage*/
@@ -102,9 +103,8 @@ void sequence_aleatoire_rapide(int **M , Grille *G , int dim , int nbcl , int af
 	}
 	
 	while(cpt < dim*dim){
-		//printf("longeur_liste = %d\n",longeur_liste(Z->Lzsg));
-		//printf("cpt = %d\n",cpt);
 		
+		nbessaie++;
 		/*tirage d'une nouvelle couleur*/
 		int tirage = 0;
 		do{
@@ -119,7 +119,6 @@ void sequence_aleatoire_rapide(int **M , Grille *G , int dim , int nbcl , int af
 			cpt += agrandit_Zsg(M,Z,tirage,ite->i,ite->j);
 			ite = ite->suiv;
 		}
-		//affichage_bordure(Z);
 		detruit_liste(&Z->B[tirage]);
 		
 		/*on change de couleur les cases de Lzsg*/
@@ -142,7 +141,7 @@ void sequence_aleatoire_rapide(int **M , Grille *G , int dim , int nbcl , int af
 	    }
 		
 	}
-	return;
+	return nbessaie+1;
 
 
 }

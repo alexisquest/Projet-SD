@@ -17,6 +17,6 @@ void trouve_zone_rec(int **M, int nbcase, int i, int j, int *taille,
    il utilise la fonction recursive pour determiner la Zsg */
 int sequence_aleatoire_rec(int **M, Grille *G, int dim, int nbcl, int aff);
 
-void sequence_aleatoire_rapide(int **M , Grille *G , int dim , int nbcl , int aff);
+int sequence_aleatoire_rapide(int **M , Grille *G , int dim , int nbcl , int aff);
 
 #endif /* FONCTIONS_H */

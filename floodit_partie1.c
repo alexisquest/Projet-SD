@@ -61,18 +61,18 @@ int main(int argc, char *argv[]) {
   temps_initial = clock();
 
   if(exo == 0) {
-    printf("%d essais, ", sequence_aleatoire_rec(M, G, dim, nbcl, aff));
+    printf("\t%d", sequence_aleatoire_rec(M, G, dim, nbcl, aff));
   }
 
   if(exo == 1) {
-    sequence_aleatoire_rapide(M , G , dim , nbcl ,aff);
+    printf("\t%d", sequence_aleatoire_rapide(M , G , dim , nbcl ,aff));
   }
 
   if(exo == 2){
   	
   	Graphe_zone* graph=cree_graphe_zone(M , dim);
   	//affichage_graphe(graph , dim);
-  	max_bordure(graph,nbcl,dim,G,aff);
+  	printf("\t%d", max_bordure(graph,nbcl,dim,G,aff));
   }
 
   if(aff == 1) {
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
   
   temps_final = clock();
   temps_cpu = (temps_final - temps_initial) * 1e-6;
-  printf("%f\n", temps_cpu);
+  printf("\t%f\n", temps_cpu);
   return 0;
 }
 

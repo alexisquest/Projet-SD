@@ -13,7 +13,7 @@ void update_bordure_graph( int couleur , Cellule_som** bordure , Sommet* zsg, Gr
 int max_tableau_cellule(Cellule_som** tab , int taille);
 
 
-void max_bordure(Graphe_zone* gz , int nbcl, int dim, Grille *G, int aff);
+int max_bordure(Graphe_zone* gz , int nbcl, int dim, Grille *G, int aff);
 
 
 #endif /* FONCTIONS_GRAPH_H */

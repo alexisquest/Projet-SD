@@ -89,7 +89,7 @@ int max_tableau_cellule(Cellule_som** tab , int taille){
 
 
 
-void max_bordure(Graphe_zone* gz , int nbcl, int dim, Grille *G, int aff){
+int max_bordure(Graphe_zone* gz , int nbcl, int dim, Grille *G, int aff){
 	
 	/*------INITIALISATION------*/
 
@@ -119,8 +119,9 @@ void max_bordure(Graphe_zone* gz , int nbcl, int dim, Grille *G, int aff){
 		grille_redessine(G);
 	}
 	int couleur_max;
+	int nbessaie=0;
 	while((couleur_max = max_tableau_cellule(bordure , nbcl))!=-1){
-	
+		nbessaie++;
 		update_bordure_graph(couleur_max , bordure , zsg , gz);
 
 		/*changement couleur dans la grille*/
@@ -138,7 +139,7 @@ void max_bordure(Graphe_zone* gz , int nbcl, int dim, Grille *G, int aff){
 		
 	}
 
-
+	return nbessaie;
 } 
 
 
