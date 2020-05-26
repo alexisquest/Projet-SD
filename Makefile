@@ -28,12 +28,6 @@ fonctions.o: fonctions.c fonctions.h liste_cases.h Zsg.h
 fonctions_graph.o: fonctions_graph.c fonctions_graph.h graphe_zones.h liste_cases.h 
 	$(CC) $(CFLAGS) -c fonctions_graph.c
 
-#floodit.o: floodit.c
-	#$(CC) $(CFLAGS) -c floodit.c 
-
-#floodit: floodit.o liste_cases.o  api_grille.o api_genere_instance.o fonctions.o Zsg.o fonctions_graph.o  graphe_zones.o
-	#$(CC) -o floodit floodit.o liste_cases.o api_grille.o api_genere_instance.o fonctions.o Zsg.o fonctions_graph.o $(LDFLAGS)
-
 floodit_partie1.o: floodit_partie1.c
 	$(CC) $(CFLAGS) -c floodit_partie1.c 
 
